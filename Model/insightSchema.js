@@ -3,10 +3,14 @@ import mongoose from "mongoose";
 const insightSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    type: String,
-    message: String,
+    skill: String,
+    type: {
+      type: String,
+      enum: ["high_gap", "repeated_gap"]
+    },
     frequency: { type: Number, default: 1 },
-    lastSeen: Date
+    lastSeen: Date,
+    message: String
   },
   { timestamps: true }
 );

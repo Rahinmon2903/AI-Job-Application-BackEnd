@@ -58,6 +58,7 @@ export const analyzeMatch = async (req, res) => {
       verdict,
       explanation: `Matched ${matchedSkills.length} out of ${requiredSkills.length} required skills.`
     });
+    
 
     res.status(201).json({
       message: "Analysis created successfully",
