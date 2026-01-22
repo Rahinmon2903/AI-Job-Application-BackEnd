@@ -19,10 +19,10 @@ app.use(cors());
 app.use(express.json());
 //routes
 app.use("/api/auth", authRoutes);
-app.use("/api/resume", resumeRoutes);
-app.use("/api/job", jobRoutes);
-app.use("/api/analysis", analysisRoutes);
-app.use("/api/insight", insightRoutes);
+app.use("/api/resumes", resumeRoutes);
+app.use("/api/jobs", jobRoutes);
+app.use("/api/analyze", analysisRoutes);
+app.use("/api/insights", insightRoutes);
 //port
 const PORT = process.env.PORT || 5000;
 
