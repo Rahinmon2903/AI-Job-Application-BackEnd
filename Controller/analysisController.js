@@ -76,9 +76,9 @@ export const analyzeMatch = async (req, res) => {
                     userId: req.user._id,
                     skill,
                     type: "high_gap",
-                    frequency: 1,
+
                     lastSeen: new Date(),
-                    message: `You have a high gap in ${skill}`
+                    message: `${skill} is a critical missing skill across multiple job applications.`
                 })
             }
         }
