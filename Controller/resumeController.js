@@ -2,6 +2,36 @@ const Resume = require("../Model/resumeSchema");
 const pdfParse = require("pdf-parse");
 const openai = require("../config/openai");
 
+//  openai function
+const extractResumeWithAI = async (resumeText) => {
+  const response = await openai.chat.completions.create({
+    model: "gpt-3.5-turbo",
+    temperature: 0,
+    messages: [
+      {
+        role: "system",
+        content: "You extract structured data from resumes."
+      },
+      {
+        role: "user",
+        content: `
+Return ONLY valid JSON in this format:
+
+{
+  "skills": [],
+  "experienceLevel": "junior | mid | senior",
+  "domains": []
+}
+
+Resume:
+${resumeText}
+`
+      }
+    ]
+  });
+
+  return JSON.parse(response.choices[0].message.content);
+};
 
 // TEXT RESUME
 const uploadResume = async (req, res) => {
@@ -12,11 +42,7 @@ const uploadResume = async (req, res) => {
       return res.status(400).json({ message: "Resume text is required" });
     }
 
-    const parsedData = {
-      skills: ["React", "Node.js", "MongoDB"],
-      experienceLevel: "mid",
-      domains: ["Web", "SaaS"]
-    };
+    const parsedData = await extractResumeWithAI(resumeText);
 
     const lastResume = await Resume.findOne({ userId: req.user._id }).sort({ version: -1 });
     const version = lastResume ? lastResume.version + 1 : 1;
@@ -48,11 +74,7 @@ const uploadResumePdf = async (req, res) => {
       return res.status(400).json({ message: "Unable to extract text from PDF" });
     }
 
-    const parsedData = {
-      skills: ["React", "Node.js", "MongoDB"],
-      experienceLevel: "mid",
-      domains: ["Web", "SaaS"]
-    };
+    const parsedData = await extractResumeWithAI(data.text);
 
     const lastResume = await Resume.findOne({ userId: req.user._id }).sort({ version: -1 });
     const version = lastResume ? lastResume.version + 1 : 1;
