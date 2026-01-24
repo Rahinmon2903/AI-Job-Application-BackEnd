@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 
 const resumeSchema = new mongoose.Schema({
@@ -21,4 +21,4 @@ const resumeSchema = new mongoose.Schema({
 );
 
 const Resume = mongoose.model('Resume', resumeSchema);
-export default Resume;
+module.exports = Resume

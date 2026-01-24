@@ -1,4 +1,4 @@
-import Job from "../Model/jobSchema.js";
+const Job = require("../Model/jobSchema");
 
 
 //reading the description andstoring in db
@@ -26,3 +26,5 @@ export const createJob = async (req, res) => {
 
     }
 }
+
+module.exports = { createJob };

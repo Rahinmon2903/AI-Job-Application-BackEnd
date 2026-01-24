@@ -1,4 +1,4 @@
-import Insight from "../Model/insightSchema.js";
+const Insight = require("../Model/insightSchema.js");
 
 //get my insights
 
@@ -10,3 +10,4 @@ export const getMyInsights = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+module.exports = { getMyInsights };

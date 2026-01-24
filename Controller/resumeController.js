@@ -63,3 +63,5 @@ export const uploadResumePdf = async (req, res) => {
   res.status(500).json({ message: "Error in uploading resume PDF" });
     }
 }
+
+module.exports = { uploadResume, uploadResumePdf };

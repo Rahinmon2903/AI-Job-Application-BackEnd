@@ -1,7 +1,7 @@
-import Job from "../Model/jobSchema.js";
-import Resume from "../Model/resumeSchema.js";
-import Analysis from "../Model/analysisSchema.js";
-import Insight from "../Model/insightSchema.js";
+const Job= require("../Model/jobSchema.js");
+const Resume = require("../Model/resumeSchema.js");
+const Insight = require("../Model/insightSchema.js");
+const Analysis = require("../Model/analysisSchema.js");
 
 // analyze match
 export const analyzeMatch = async (req, res) => {
@@ -115,3 +115,5 @@ export const analyzeMatch = async (req, res) => {
         res.status(500).json({ message: "Error in creating analysis" });
     }
 };
+
+module.exports = { analyzeMatch };

@@ -1,6 +1,4 @@
-import User from "../Model/userSchema.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+const User = require("../Model/userSchema");
 
 
 //register
@@ -48,3 +46,5 @@ export const login = async (req, res) => {
 
     }
 }
+
+module.exports = { register, login };

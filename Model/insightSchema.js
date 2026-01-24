@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const insightSchema = new mongoose.Schema(
   {
@@ -16,4 +16,4 @@ const insightSchema = new mongoose.Schema(
 );
 
 const Insight = mongoose.model("Insight", insightSchema);
-export default Insight;
+module.exports = Insight;
