@@ -15,7 +15,7 @@ export const createJob = async (req, res) => {
             seniority: "mid",
             domain: "Web / SaaS"
         };
-        const newJob = new Job({ userId: req.user._id, text: jobDescription, extracted });
+        const newJob = new Job({ userId: req.user._id, text: jobText, extracted });
         await newJob.save();
         res.status(201).json({ message: "Job created successfully", job: newJob });
 
