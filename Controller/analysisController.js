@@ -4,7 +4,7 @@ const Insight = require("../Model/insightSchema.js");
 const Analysis = require("../Model/analysisSchema.js");
 
 // analyze match
-export const analyzeMatch = async (req, res) => {
+const analyzeMatch = async (req, res) => {
     try {
         const { jobId, resumeId } = req.body;
 

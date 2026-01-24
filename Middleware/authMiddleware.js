@@ -2,7 +2,7 @@ const User=require("../Model/userSchema");
 const jwt = require("jsonwebtoken");
 
 
-export const protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
   if (

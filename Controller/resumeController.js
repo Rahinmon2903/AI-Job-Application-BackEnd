@@ -1,67 +1,72 @@
 const Resume = require("../Model/resumeSchema");
 const pdfParse = require("pdf-parse");
 
+// TEXT RESUME
+const uploadResume = async (req, res) => {
+  try {
+    const { resumeText } = req.body;
 
-
-
-export const uploadResume = async (req, res) => {
-    try {
-        const { resumeText } = req.body;
-        if (!resumeText) {
-            return res.status(400).json({ message: "Resume text is required" });
-
-        }
-        //AI output
-        const parsedData = {
-            skills: ["React", "Node.js", "MongoDB"],
-            experienceLevel: "mid",
-            domains: ["Web", "SaaS"]
-        };
-        const lastResume = await Resume.findOne({ userId: req.user._id }).sort({ version: -1 });
-
-        const version = lastResume ? lastResume.version + 1 : 1;
-        const newResume = new Resume({ userId: req.user._id, originalText: resumeText, parsedData,version });
-        await newResume.save();
-        res.status(201).json({ message: "Resume uploaded successfully", resume: newResume });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Error in uploading resume" });
+    if (!resumeText) {
+      return res.status(400).json({ message: "Resume text is required" });
     }
-}
 
-export const uploadResumePdf = async (req, res) => {
-    try {
-          if (!req.file) {
+    const parsedData = {
+      skills: ["React", "Node.js", "MongoDB"],
+      experienceLevel: "mid",
+      domains: ["Web", "SaaS"]
+    };
+
+    const lastResume = await Resume.findOne({ userId: req.user._id }).sort({ version: -1 });
+    const version = lastResume ? lastResume.version + 1 : 1;
+
+    const resume = await Resume.create({
+      userId: req.user._id,
+      originalText: resumeText,
+      parsedData,
+      version
+    });
+
+    res.status(201).json({ message: "Resume uploaded", resume });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Upload failed" });
+  }
+};
+
+// PDF RESUME
+const uploadResumePdf = async (req, res) => {
+  try {
+    if (!req.file) {
       return res.status(400).json({ message: "PDF file required" });
     }
 
-    const pdfData = await pdfParse(req.file.buffer);
-    const resumeText=pdfData.text;
+    const data = await pdfParse(req.file.buffer);
 
-    if (!resumeText || resumeText.trim().length === 0) {
-  return res.status(400).json({
-    message: "Unable to extract text from this PDF. Try another file."
-  });
-}
-     //AI output
-        const parsedData = {
-            skills: ["React", "Node.js", "MongoDB"],
-            experienceLevel: "mid",
-            domains: ["Web", "SaaS"]
-        };
-        const lastResume = await Resume.findOne({ userId: req.user._id }).sort({ version: -1 });
-
-        const version = lastResume ? lastResume.version + 1 : 1;
-        const newResume = new Resume({ userId: req.user._id, originalText: resumeText, parsedData,version });
-        await newResume.save();
-        res.status(201).json({ message: "Resume uploaded successfully", resume: newResume });
-
-
-    } catch (error) {
-         console.error("PDF PARSE ERROR:", error.message);
-  console.error(error);
-  res.status(500).json({ message: "Error in uploading resume PDF" });
+    if (!data.text || data.text.trim().length === 0) {
+      return res.status(400).json({ message: "Unable to extract text from PDF" });
     }
-}
+
+    const parsedData = {
+      skills: ["React", "Node.js", "MongoDB"],
+      experienceLevel: "mid",
+      domains: ["Web", "SaaS"]
+    };
+
+    const lastResume = await Resume.findOne({ userId: req.user._id }).sort({ version: -1 });
+    const version = lastResume ? lastResume.version + 1 : 1;
+
+    const resume = await Resume.create({
+      userId: req.user._id,
+      originalText: data.text,
+      parsedData,
+      version
+    });
+
+    res.status(201).json({ message: "PDF resume uploaded", resume });
+  } catch (err) {
+    console.error("PDF ERROR:", err);
+    res.status(500).json({ message: "PDF upload failed" });
+  }
+};
 
 module.exports = { uploadResume, uploadResumePdf };

@@ -2,7 +2,7 @@ const Job = require("../Model/jobSchema");
 
 
 //reading the description andstoring in db
-export const createJob = async (req, res) => {
+const createJob = async (req, res) => {
     try {
         const { jobText } = req.body;
         if (! jobText) {

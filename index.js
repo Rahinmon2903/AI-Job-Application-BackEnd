@@ -21,7 +21,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/jobs", jobRoutes);
-app.use("/api/analyze", analysisRoutes);
+app.use("/api/analysis", analysisRoutes);
 app.use("/api/insights", insightRoutes);
 //port
 const PORT = process.env.PORT || 5000;
