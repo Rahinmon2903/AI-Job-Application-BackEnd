@@ -1,5 +1,7 @@
 const Resume = require("../Model/resumeSchema");
 const pdfParse = require("pdf-parse");
+const openai = require("../config/openai");
+
 
 // TEXT RESUME
 const uploadResume = async (req, res) => {
