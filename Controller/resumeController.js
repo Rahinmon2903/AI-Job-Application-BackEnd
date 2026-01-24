@@ -1,5 +1,7 @@
-import Resume from "../Model/resumeSchema.js";
-import pdfParse from "pdf-parse";
+const Resume = require("../Model/resumeSchema");
+const pdfParse = require("pdf-parse");
+
+
 
 
 export const uploadResume = async (req, res) => {
@@ -35,6 +37,12 @@ export const uploadResumePdf = async (req, res) => {
 
     const pdfData = await pdfParse(req.file.buffer);
     const resumeText=pdfData.text;
+
+    if (!resumeText || resumeText.trim().length === 0) {
+  return res.status(400).json({
+    message: "Unable to extract text from this PDF. Try another file."
+  });
+}
      //AI output
         const parsedData = {
             skills: ["React", "Node.js", "MongoDB"],
@@ -50,7 +58,8 @@ export const uploadResumePdf = async (req, res) => {
 
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Error in uploading resume PDF" });
+         console.error("PDF PARSE ERROR:", error.message);
+  console.error(error);
+  res.status(500).json({ message: "Error in uploading resume PDF" });
     }
 }
