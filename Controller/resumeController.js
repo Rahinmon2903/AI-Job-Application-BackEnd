@@ -2,10 +2,20 @@ const Resume = require("../Model/resumeSchema");
 const pdfParse = require("pdf-parse");
 const groq = require("../config/groq");
 
+
+const extractJSONBlock = (text) => {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) {
+        throw new Error("No JSON object found in AI response");
+    }
+    return match[0];
+};
+
+
 //AI FUNCTION 
 const extractResumeWithAI = async (resumeText) => {
   const response = await groq.chat.completions.create({
-    model: "llama3-8b-8192",
+    model: "llama-3.1-8b-instant",
     temperature: 0,
     messages: [
       {
@@ -30,7 +40,11 @@ ${resumeText}
     ]
   });
 
-  return JSON.parse(response.choices[0].message.content);
+  const raw = response.choices[0].message.content;
+const jsonOnly = extractJSONBlock(raw);
+return JSON.parse(jsonOnly);
+
+
 };
 
 // ---------- TEXT RESUME ----------
