@@ -1,21 +1,20 @@
 const Job = require("../Model/jobSchema");
-const openai = require("../config/openai");
+const groq = require("../config/groq");
 
-
-//AI
+// AI FUNCTION
 const extractJobWithAI = async (jobText) => {
-  const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
+  const response = await groq.chat.completions.create({
+    model: "llama3-8b-8192",
     temperature: 0,
     messages: [
       {
         role: "system",
-        content: "You extract structured job requirements."
+        content: "Extract structured job requirements."
       },
       {
         role: "user",
         content: `
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON:
 
 {
   "requiredSkills": [],
@@ -34,28 +33,27 @@ ${jobText}
   return JSON.parse(response.choices[0].message.content);
 };
 
-
-
-//reading the description andstoring in db
+// CONTROLLER 
 const createJob = async (req, res) => {
-    try {
-        const { jobText } = req.body;
-        if (! jobText) {
-            return res.status(400).json({ message: "Job description is required" });
-        }
-
-        const extracted = await extractJobWithAI(jobText);
-    
-        const newJob = new Job({ userId: req.user._id, text: jobText, extracted });
-        await newJob.save();
-        res.status(201).json({ message: "Job created successfully", job: newJob });
-
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Error in creating job" });
-
+  try {
+    const { jobText } = req.body;
+    if (!jobText) {
+      return res.status(400).json({ message: "Job text required" });
     }
-}
+
+    const extracted = await extractJobWithAI(jobText);
+
+    const job = await Job.create({
+      userId: req.user._id,
+      text: jobText,
+      extracted
+    });
+
+    res.status(201).json({ job });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Job creation failed" });
+  }
+};
 
 module.exports = { createJob };
