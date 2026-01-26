@@ -100,7 +100,7 @@ const htmlContent = `
             <tr>
               <td style="background:#0f172a; padding:20px 24px;">
                 <h1 style="margin:0; font-size:18px; color:#ffffff;">
-                  RBAC Control Panel
+                  RESUME MANAGEMENT SUSTEM
                 </h1>
                 <p style="margin:4px 0 0; font-size:12px; color:#cbd5f5;">
                   Secure Authorization System
@@ -147,7 +147,7 @@ const htmlContent = `
                   This is an automated security message. Please do not reply.
                 </p>
                 <p style="margin:6px 0 0;">
-                  © ${new Date().getFullYear()} RBAC Control Panel
+                  © ${new Date().getFullYear()} RESUME MANAGEMENT SYSTEM
                 </p>
               </td>
             </tr>
