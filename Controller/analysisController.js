@@ -17,48 +17,55 @@ const normalizeSkill = (skill) => {
 // analyze match
 const analyzeMatch = async (req, res) => {
     try {
+        //destructure
         const { jobId, resumeId } = req.body;
 
+
+        //validation
         if (!jobId || !resumeId) {
             return res.status(400).json({ message: "Job and resume ids are required" });
         }
 
+        //finding resume and job
         const resume = await Resume.findById(resumeId);
         const job = await Job.findById(jobId);
-
+         //validation
         if (!resume || !job) {
             return res.status(404).json({ message: "Resume or job not found" });
         }
 
+//extracting resumeskills,requiredskills,preferredskills
         const resumeSkills = resume.parsedData.skills.map(normalizeSkill);
         const requiredSkills = job.extracted.requiredSkills.map(normalizeSkill);
         const preferredSkills = job.extracted.preferredSkills.map(normalizeSkill);
 
-
+      //matching resume and required skills
         const matchedSkills = requiredSkills.filter(reqSkill => {
             const parts = reqSkill.split(" and ").map(s => s.trim());
             return parts.every(p => resumeSkills.includes(p));
         });
 
+
+       //finding missing skills
         const missingSkills = requiredSkills.filter(reqSkill => {
             const parts = reqSkill.split(" and ").map(s => s.trim());
             return !parts.every(p => resumeSkills.includes(p));
         });
-
+        //finding high impact gaps
         const highImpactGaps = preferredSkills.filter(skill =>
             !resumeSkills.includes(skill)
         );
-
+        //finding match score
         const score =
             requiredSkills.length === 0
                 ? 0
                 : Math.round((matchedSkills.length / requiredSkills.length) * 100);
-
+        //setting sore based on our condition
         let verdict = "Not Ready";
         if (score >= 80) verdict = "Ready to Apply";
         else if (score >= 50) verdict = "Partially Ready";
         else if (score >= 30) verdict = "Partially Not Ready";
-
+        //creating new analysis
         const analysis = await Analysis.create({
             userId: req.user._id,
             jobId,
@@ -69,19 +76,22 @@ const analyzeMatch = async (req, res) => {
             verdict,
             explanation: `Matched ${matchedSkills.length} out of ${requiredSkills.length} required skills.`
         });
-
+        //in our insights in type we have two types high_gap and repeated_gap
+        //required skills mean this skill is not optional we need it so it is high_gap
+        //in the output of missing skill we have the required skills which are not present in resume
         for (let skill of missingSkills) {
             const insight = await Insight.findOne({
                 userId: req.user._id,
                 skill,
                 type: "high_gap"
             })
-
+            // if the skill already present we just increase the frequency and update the date
             if (insight) {
                 insight.frequency++;
                 insight.lastSeen = new Date();
                 await insight.save();
             } else {
+                //else we create a new insight for that skill
                 await Insight.create({
                     userId: req.user._id,
                     skill,
@@ -92,19 +102,20 @@ const analyzeMatch = async (req, res) => {
                 })
             }
         }
-
+        //we have the preferred skills which are not present in resume
         for (const skill of highImpactGaps) {
             let insight = await Insight.findOne({
                 userId: req.user._id,
                 skill,
                 type: "repeated_gap"
             });
-
+           //if the skill already present we just increase the frequency and update the date
             if (insight) {
                 insight.frequency += 1;
                 insight.lastSeen = new Date();
                 await insight.save();
             } else {
+                //else we create a new insight for that skill
                 await Insight.create({
                     userId: req.user._id,
                     skill,
