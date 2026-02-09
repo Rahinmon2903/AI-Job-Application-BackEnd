@@ -141,10 +141,11 @@ const analyzeMatch = async (req, res) => {
 //getting history
 const getMyAnalysisHistory = async (req, res) => {
   try {
+    //getting all my analysis output
     const history = await Analysis.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
       .limit(20);
-
+    
     res.status(200).json(history);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -155,6 +156,7 @@ const getMyAnalysisHistory = async (req, res) => {
 // get single analysis by id
 const getAnalysisById = async (req, res) => {
   try {
+    //getting single analysis
     const analysis = await Analysis.findOne({
       _id: req.params.id,
       userId: req.user._id
