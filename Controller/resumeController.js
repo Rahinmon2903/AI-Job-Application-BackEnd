@@ -47,6 +47,7 @@ return JSON.parse(jsonOnly);
 
 };
 
+
 // ---------- TEXT RESUME ----------
 const uploadResume = async (req, res) => {
   try {
@@ -80,7 +81,7 @@ const uploadResumePdf = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "PDF required" });
     }
-
+    
     const data = await pdfParse(req.file.buffer);
     if (!data.text || data.text.trim().length === 0) {
       return res.status(400).json({ message: "Unable to read PDF" });
@@ -106,3 +107,4 @@ const uploadResumePdf = async (req, res) => {
 };
 
 module.exports = { uploadResume, uploadResumePdf };
+
