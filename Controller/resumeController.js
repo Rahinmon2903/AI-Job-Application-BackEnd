@@ -89,7 +89,7 @@ const uploadResumePdf = async (req, res) => {
       return res.status(400).json({ message: "PDF required" });
     }
     
-    const data = await pdfParse(req.file.buffer);
+    const data = await pdfParse(req.file.buffer);//converting a raw binary data to text
     if (!data.text || data.text.trim().length === 0) {
       return res.status(400).json({ message: "Unable to read PDF" });
     }
