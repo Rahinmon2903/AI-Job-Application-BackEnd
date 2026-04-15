@@ -10,7 +10,7 @@ const normalizeSkill = (skill) => {
         .replace(/\(.*?\)/g, "")//remove brackets
         .replace(/&/g, "and")//convert && to and
         .replace(/[^a-z0-9\s]/g, "")//remove special characters
-        .trim();//remove extra spce
+        .trim();//remove extra space
 };
 
 
@@ -40,6 +40,7 @@ const analyzeMatch = async (req, res) => {
         const preferredSkills = job.extracted.preferredSkills.map(normalizeSkill);
 
       //matching resume and required skills
+      //"html and css" → ["html", "css"]
         const matchedSkills = requiredSkills.filter(reqSkill => {
             const parts = reqSkill.split(" and ").map(s => s.trim());
             return parts.every(p => resumeSkills.includes(p));
