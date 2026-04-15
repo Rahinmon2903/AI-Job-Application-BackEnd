@@ -4,6 +4,12 @@ const groq = require("../config/groq");
 
 
 const extractJSONBlock = (text) => {
+  /* Look inside the AI response string
+ Start when you see {
+Capture everything (spaces + non-spaces + new lines)
+ Stop when you reach */
+
+
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) {
         throw new Error("No JSON object found in AI response");

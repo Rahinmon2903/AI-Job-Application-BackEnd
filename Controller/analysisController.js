@@ -6,11 +6,11 @@ const Analysis = require("../Model/analysisSchema.js");
 
 const normalizeSkill = (skill) => {
     return skill
-        .toLowerCase()
-        .replace(/\(.*?\)/g, "")
-        .replace(/&/g, "and")
-        .replace(/[^a-z0-9\s]/g, "")
-        .trim();
+        .toLowerCase()//converts into lower case
+        .replace(/\(.*?\)/g, "")//remove brackets
+        .replace(/&/g, "and")//convert && to and
+        .replace(/[^a-z0-9\s]/g, "")//remove special characters
+        .trim();//remove extra spce
 };
 
 
@@ -46,6 +46,7 @@ const analyzeMatch = async (req, res) => {
         });
 
 
+        
        //finding missing skills
         const missingSkills = requiredSkills.filter(reqSkill => {
             const parts = reqSkill.split(" and ").map(s => s.trim());
