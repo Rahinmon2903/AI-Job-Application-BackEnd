@@ -23,6 +23,7 @@ const extractResumeWithAI = async (resumeText) => {
   const response = await groq.chat.completions.create({
     model: "llama-3.1-8b-instant",
     temperature: 0,
+    // n: 3  if we want we can ask multiple responses
     messages: [
       {
         role: "system",
