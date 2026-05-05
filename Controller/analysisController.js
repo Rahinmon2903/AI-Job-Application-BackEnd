@@ -4,73 +4,81 @@ import Insight from "../Model/insightSchema.js";
 import Analysis from "../Model/analysisSchema.js";
 
 
+// 🔧 Normalize skills
 const normalizeSkill = (skill) => {
     return skill
-        .toLowerCase() // converts into lower case
-        .replace(/\(.*?\)/g, "") // remove brackets
-        .replace(/&/g, "and") // convert && to and
-        .replace(/[^a-z0-9\s]/g, "") // remove special characters
-        .trim(); // remove extra space
+        .toLowerCase()
+        .replace(/\(.*?\)/g, "")
+        .replace(/&/g, "and")
+        .replace(/\bnode\s?js\b/g, "nodejs")
+        .replace(/\bexpress\s?js\b/g, "expressjs")
+        .replace(/\bjs\b/g, "javascript")
+        .replace(/[^a-z0-9\s]/g, "")
+        .trim();
+};
+
+
+// 🔧 Split skills properly
+const splitSkills = (skills) => {
+    return skills.flatMap(skill =>
+        skill
+            .toLowerCase()
+            .split(/,|and|\/|\s+/)   // handles comma, "and", slash, and spaces
+            .map(s => s.trim())
+            .filter(Boolean)
+    );
 };
 
 
 // analyze match
 export const analyzeMatch = async (req, res) => {
     try {
-        // destructure
         const { jobId, resumeId } = req.body;
 
-        // validation
         if (!jobId || !resumeId) {
             return res.status(400).json({ message: "Job and resume ids are required" });
         }
 
-        // finding resume and job
         const [resume, job] = await Promise.all([
             Resume.findById(resumeId),
             Job.findById(jobId)
         ]);
 
-        // validation
         if (!resume || !job) {
             return res.status(404).json({ message: "Resume or job not found" });
         }
 
-        // extracting skills
-        const resumeSkills = resume.parsedData.skills.map(normalizeSkill);
-        const requiredSkills = job.extracted.requiredSkills.map(normalizeSkill);
-        const preferredSkills = job.extracted.preferredSkills.map(normalizeSkill);
+        // 🔥 Apply split + normalize
+        const resumeSkills = splitSkills(resume.parsedData.skills).map(normalizeSkill);
+        const requiredSkills = splitSkills(job.extracted.requiredSkills).map(normalizeSkill);
+        const preferredSkills = splitSkills(job.extracted.preferredSkills).map(normalizeSkill);
 
-        // matching required skills
-        const matchedSkills = requiredSkills.filter(reqSkill => {
-            const parts = reqSkill.split(" and ").map(s => s.trim());
-            return parts.every(p => resumeSkills.includes(p));
-        });
+        // 🔥 Matching logic
+        const matchedSkills = requiredSkills.filter(skill =>
+            resumeSkills.includes(skill)
+        );
 
-        // missing required skills
-        const missingSkills = requiredSkills.filter(reqSkill => {
-            const parts = reqSkill.split(" and ").map(s => s.trim());
-            return !parts.every(p => resumeSkills.includes(p));
-        });
+        const missingSkills = requiredSkills.filter(skill =>
+            !resumeSkills.includes(skill)
+        );
 
-        // preferred gaps
         const highImpactGaps = preferredSkills.filter(skill =>
             !resumeSkills.includes(skill)
         );
 
-        // score
+        // 🔥 Score calculation
         const score =
             requiredSkills.length === 0
                 ? 0
                 : Math.round((matchedSkills.length / requiredSkills.length) * 100);
 
-        // verdict
+        // 🔥 Verdict logic
         let verdict = "Not Ready";
         if (score >= 80) verdict = "Ready to Apply";
         else if (score >= 50) verdict = "Partially Ready";
         else if (score >= 30) verdict = "Partially Not Ready";
 
-        // save analysis
+        // 🔥 Save analysis
         const analysis = await Analysis.create({
             userId: req.user._id,
             jobId,
@@ -82,7 +90,7 @@ export const analyzeMatch = async (req, res) => {
             explanation: `Matched ${matchedSkills.length} out of ${requiredSkills.length} required skills.`
         });
 
-        // --- INSIGHTS (optimized) ---
+        // 🔥 INSIGHTS
         const now = new Date();
 
         for (const skill of missingSkills) {
@@ -125,34 +133,34 @@ export const analyzeMatch = async (req, res) => {
 };
 
 
-// getting history
+// get history
 export const getMyAnalysisHistory = async (req, res) => {
-  try {
-    const history = await Analysis.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    try {
+        const history = await Analysis.find({ userId: req.user._id })
+            .sort({ createdAt: -1 })
+            .limit(20);
 
-    res.status(200).json(history);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 
-// get single analysis by id
+// get single analysis
 export const getAnalysisById = async (req, res) => {
-  try {
-    const analysis = await Analysis.findOne({
-      _id: req.params.id,
-      userId: req.user._id
-    });
+    try {
+        const analysis = await Analysis.findOne({
+            _id: req.params.id,
+            userId: req.user._id
+        });
 
-    if (!analysis) {
-      return res.status(404).json({ message: "Analysis not found" });
+        if (!analysis) {
+            return res.status(404).json({ message: "Analysis not found" });
+        }
+
+        res.status(200).json(analysis);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-
-    res.status(200).json(analysis);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 };
