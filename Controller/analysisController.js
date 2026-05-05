@@ -23,7 +23,7 @@ const splitSkills = (skills) => {
     return skills.flatMap(skill =>
         skill
             .toLowerCase()
-            .split(/,|and|\/|\s+/)   // handles comma, "and", slash, and spaces
+            .split(/,| and |\/|\|/)  // handles comma, "and", slash, and spaces
             .map(s => s.trim())
             .filter(Boolean)
     );
