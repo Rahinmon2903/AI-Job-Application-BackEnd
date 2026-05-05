@@ -1,13 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const connectDB = require("./config/db.js");
-const authRoutes = require("./Router/authRoute.js");
-const resumeRoutes = require("./Router/resumeRoute.js");
-const jobRoutes = require("./Router/jobRoute.js");
-const analysisRoutes = require("./Router/analysisRoute.js");
-const insightRoutes = require("./Router/insightRoute.js");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 
+import connectDB from "./config/db.js";
+import authRoutes from "./Router/authRoute.js";
+import resumeRoutes from "./Router/resumeRoute.js";
+import jobRoutes from "./Router/jobRoute.js";
+import analysisRoutes from "./Router/analysisRoute.js";
+import insightRoutes from "./Router/insightRoute.js";
 //config
 dotenv.config();
 //db

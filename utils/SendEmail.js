@@ -1,5 +1,5 @@
-const SibApiV3Sdk = require("sib-api-v3-sdk");
-const dotenv = require("dotenv");
+import SibApiV3Sdk from "sib-api-v3-sdk";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -23,4 +23,4 @@ const sendEmail = async (to, subject, htmlContent) => {
   await tranEmailApi.sendTransacEmail(emailData);
 };
 
-module.exports = sendEmail; 
+export default sendEmail;

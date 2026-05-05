@@ -1,10 +1,9 @@
-const express=require("express");
-const {protect}=require("../Middleware/authMiddleware");
-const {createJob}=require("../Controller/jobController");
+import express from "express";
+import { protect } from "../Middleware/authMiddleware.js";
+import { createJob } from "../Controller/jobController.js";
 
+const router = express.Router();
 
-const router=express.Router();
+router.post("/", protect, createJob);
 
-router.post("/",protect, createJob);
-
-module.exports=router;
+export default router;

@@ -1,5 +1,5 @@
-const Job = require("../Model/jobSchema");
-const groq = require("../config/groq");
+import Job from "../Model/jobSchema.js";
+import groq from "../config/groq.js";
 
 
 const extractJSONBlock = (text) => {
@@ -42,15 +42,20 @@ ${jobText}
 
     const raw = response.choices[0].message.content;
     const jsonOnly = extractJSONBlock(raw);
-    return JSON.parse(jsonOnly);
 
-
+    try {
+        return JSON.parse(jsonOnly);
+    } catch {
+        throw new Error("Invalid JSON returned from AI");
+    }
 };
 
+
 // CONTROLLER 
-const createJob = async (req, res) => {
+export const createJob = async (req, res) => {
     try {
         const { jobText } = req.body;
+
         if (!jobText) {
             return res.status(400).json({ message: "Job text required" });
         }
@@ -69,5 +74,3 @@ const createJob = async (req, res) => {
         res.status(500).json({ message: "Job creation failed" });
     }
 };
-
-module.exports = { createJob };

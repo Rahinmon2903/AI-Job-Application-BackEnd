@@ -1,0 +1,46 @@
+
+
+Rahin Mon S
+Chennai, India | rahin2903@gmail.com | +91 9791290327
+linkedin.com/in/rahin-mon-877b2421b | github.com/Rahinmon2903 | portfolio.vercel.app
+Career Objective
+MERN Stack Developer and B.Tech Information Technology student with hands-on experience building full stack web ap-
+plications using MongoDB, Express.js, React.js, and Node.js. Skilled in full stack development, REST API development,
+API integration, JWT authentication, authentication & authorization, and responsive web application development.
+Completed an internship at Siemens and multiple MERN-based projects with experience in developing scalable web
+applications and backend systems.
+Technical Skills
+Frontend:React.js, JavaScript (ES6+), HTML5, CSS3, Tailwind CSS, Responsive UI Development
+Backend:Node.js, Express.js, REST APIs, API Development, JWT Authentication, Authentication & Authorization
+Databases:MongoDB, MySQL, Database Management
+Tools:Git, GitHub, Postman, PowerBI, API Testing
+Internship
+Data Visualization Trainee (Power BI) — Siemens Training ProgramMar 2024 – Apr 2024
+•Completed a structured training program in Power BI focusing on data visualization and analytics.
+•Built Power BI dashboards using datasets with over 1,000 records.
+•Designed visual reports to support data analysis and decision making.
+•Applied data cleaning, transformation, and reporting techniques following professional workflows.
+Projects
+AI Resume Analysis Platform (MERN Stack)
+•Built a full stack MERN application using React.js, Node.js, Express.js, and MongoDB.
+•Created 8+ REST APIs for resume analysis, API integration, and job matching systems.
+•Integrated JWT authentication, protected routes, and backend security mechanisms.
+Role-Based Access Control Dashboard (MERN Stack)
+•Applied role-based access control (RBAC) using JWT authentication.
+•Designed secure backend APIs using Node.js and Express.js for user management.
+Invoice Management System (React)
+•Built a React application to create and manage invoices.
+•Stored and managed 50+ invoice records using browser storage.
+CineVerse — Movie Review Application
+•Built a React-based movie review web application using OMDb API integration.
+•Enabled real-time search functionality and responsive UI design.
+Certifications
+MERN Full Stack Development — GUVI (4+ Months)
+Data Analytics using Power BI — TANSAM
+Web Development — Codebind Technologies
+Education
+Anna University — Panimalar Institute of TechnologyNov 2021 – Jun 2025
+B.Tech in Information Technology
+Graduation: April 2026GPA: 8.21 / 10
+Full Stack Developer, MERN Stack Developer, Web Application Development, Backend Development, Frontend Devel-
+opment, REST API, API Integration, Authentication, Authorization, Database Management

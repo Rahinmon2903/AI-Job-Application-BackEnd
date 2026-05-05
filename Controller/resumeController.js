@@ -1,6 +1,6 @@
-const Resume = require("../Model/resumeSchema");
-const pdfParse = require("pdf-parse");
-const groq = require("../config/groq");
+import Resume from "../Model/resumeSchema.js";
+import pdfParse from "pdf-parse";
+import groq from "../config/groq.js";
 
 
 const extractJSONBlock = (text) => {
@@ -8,7 +8,6 @@ const extractJSONBlock = (text) => {
  Start when you see {
 Capture everything (spaces + non-spaces + new lines)
  Stop when you reach */
-
 
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) {
@@ -48,15 +47,18 @@ ${resumeText}
   });
 
   const raw = response.choices[0].message.content;
-const jsonOnly = extractJSONBlock(raw);
-return JSON.parse(jsonOnly);
+  const jsonOnly = extractJSONBlock(raw);
 
-
+  try {
+    return JSON.parse(jsonOnly);
+  } catch {
+    throw new Error("Invalid JSON returned from AI");
+  }
 };
 
 
 // ---------- TEXT RESUME ----------
-const uploadResume = async (req, res) => {
+export const uploadResume = async (req, res) => {
   try {
     const { resumeText } = req.body;
     if (!resumeText) {
@@ -82,14 +84,15 @@ const uploadResume = async (req, res) => {
   }
 };
 
+
 // ---------- PDF RESUME ----------
-const uploadResumePdf = async (req, res) => {
+export const uploadResumePdf = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "PDF required" });
     }
     
-    const data = await pdfParse(req.file.buffer);//converting a raw binary data to text
+    const data = await pdfParse(req.file.buffer); // converting a raw binary data to text
     if (!data.text || data.text.trim().length === 0) {
       return res.status(400).json({ message: "Unable to read PDF" });
     }
@@ -112,6 +115,3 @@ const uploadResumePdf = async (req, res) => {
     res.status(500).json({ message: "PDF upload failed" });
   }
 };
-
-module.exports = { uploadResume, uploadResumePdf };
-

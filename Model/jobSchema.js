@@ -1,22 +1,22 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const jobSchema = new mongoose.Schema({
+const jobSchema = new mongoose.Schema(
+  {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
     },
     text: String,
     extracted: {
-        requiredSkills: [String],
-        preferredSkills: [String],
-        seniority: String,
-        domain: String
+      requiredSkills: [String],
+      preferredSkills: [String],
+      seniority: String,
+      domain: String
     }
+  },
+  { timestamps: true }
+);
 
-},
-{ timestamps: true }
+const Job = mongoose.model("Job", jobSchema);
 
-)
-
-const Job = mongoose.model('Job', jobSchema);
-module.exports = Job
+export default Job;
