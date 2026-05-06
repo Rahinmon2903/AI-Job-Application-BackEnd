@@ -4,28 +4,91 @@ import Insight from "../Model/insightSchema.js";
 import Analysis from "../Model/analysisSchema.js";
 
 
-// 🔧 Normalize skills
-const normalizeSkill = (skill) => {
-    return skill
-        .toLowerCase()
-        .replace(/\(.*?\)/g, "")
-        .replace(/&/g, "and")
-        .replace(/\bnode\s?js\b/g, "nodejs")
-        .replace(/\bexpress\s?js\b/g, "expressjs")
-        .replace(/\bjs\b/g, "javascript")
-        .replace(/[^a-z0-9\s]/g, "")
-        .trim();
+
+const SKILL_SYNONYMS = {
+    html5: "html",
+    css3: "css",
+    js: "javascript",
+    ts: "typescript",
+    "node.js": "nodejs",
+    "node js": "nodejs",
+    expressjs: "express",
+    "express.js": "express",
+    reactjs: "react",
+    "react.js": "react",
+    angularjs: "angular",
+    "angular.js": "angular",
+    vuejs: "vue",
+    "vue.js": "vue",
+    mongodb: "mongo",
+    "mongo db": "mongo",
+    sql: "database",
+    mysql: "database",
+    postgres: "database",
+    restapi: "api",
+    "rest api": "api",
+    apis: "api",
+    github: "git",
+    gitlab: "git",
+    dockerized: "docker",
+    kubernetes: "k8s",
+    "kubernetes": "k8s",
+    firebase: "backend",
+    reduxjs: "redux",
+    "redux.js": "redux"
 };
 
 
-// 🔧 Split skills properly
+// 🔧 Normalize skills (SCALABLE)
+const normalizeSkill = (skill) => {
+    let s = skill.toLowerCase().trim();
+
+    // remove brackets
+    s = s.replace(/\(.*?\)/g, "");
+
+    // remove version numbers (HTML5 → html)
+    s = s.replace(/\d+(\.\d+)?/g, "");
+
+    // normalize dots
+    s = s.replace(/\./g, "");
+
+    // replace special chars
+    s = s.replace(/&/g, "and");
+
+    // remove extra spaces
+    s = s.replace(/\s+/g, " ").trim();
+
+    // apply synonym mapping
+    if (SKILL_SYNONYMS[s]) {
+        return SKILL_SYNONYMS[s];
+    }
+
+    return s;
+};
+
+
+//  Split skills
 const splitSkills = (skills) => {
     return skills.flatMap(skill =>
         skill
             .toLowerCase()
-            .split(/,| and |\/|\|/)  // handles comma, "and", slash, and spaces
+            .split(/,| and |\/|\|/)
             .map(s => s.trim())
             .filter(Boolean)
+    );
+};
+
+
+//  Remove duplicates
+const unique = (arr) => [...new Set(arr)];
+
+
+
+const isMatch = (skill, resumeSkills) => {
+    return resumeSkills.some(r =>
+        r === skill ||
+        r.includes(skill) ||
+        skill.includes(r)
     );
 };
 
@@ -48,37 +111,45 @@ export const analyzeMatch = async (req, res) => {
             return res.status(404).json({ message: "Resume or job not found" });
         }
 
-        // 🔥 Apply split + normalize
-        const resumeSkills = splitSkills(resume.parsedData.skills).map(normalizeSkill);
-        const requiredSkills = splitSkills(job.extracted.requiredSkills).map(normalizeSkill);
-        const preferredSkills = splitSkills(job.extracted.preferredSkills).map(normalizeSkill);
+        //  APPLY FULL PIPELINE
+        const resumeSkills = unique(
+            splitSkills(resume.parsedData.skills).map(normalizeSkill)
+        );
 
-        // 🔥 Matching logic
+        const requiredSkills = unique(
+            splitSkills(job.extracted.requiredSkills).map(normalizeSkill)
+        );
+
+        const preferredSkills = unique(
+            splitSkills(job.extracted.preferredSkills).map(normalizeSkill)
+        );
+
+        //  SMART MATCHING
         const matchedSkills = requiredSkills.filter(skill =>
-            resumeSkills.includes(skill)
+            isMatch(skill, resumeSkills)
         );
 
         const missingSkills = requiredSkills.filter(skill =>
-            !resumeSkills.includes(skill)
+            !isMatch(skill, resumeSkills)
         );
 
         const highImpactGaps = preferredSkills.filter(skill =>
-            !resumeSkills.includes(skill)
+            !isMatch(skill, resumeSkills)
         );
 
-        // 🔥 Score calculation
+        // SCORE
         const score =
             requiredSkills.length === 0
                 ? 0
                 : Math.round((matchedSkills.length / requiredSkills.length) * 100);
 
-        // 🔥 Verdict logic
+        // VERDICT
         let verdict = "Not Ready";
         if (score >= 80) verdict = "Ready to Apply";
         else if (score >= 50) verdict = "Partially Ready";
         else if (score >= 30) verdict = "Partially Not Ready";
 
-        // 🔥 Save analysis
+        //  SAVE
         const analysis = await Analysis.create({
             userId: req.user._id,
             jobId,
@@ -90,7 +161,7 @@ export const analyzeMatch = async (req, res) => {
             explanation: `Matched ${matchedSkills.length} out of ${requiredSkills.length} required skills.`
         });
 
-        // 🔥 INSIGHTS
+        //  INSIGHTS
         const now = new Date();
 
         for (const skill of missingSkills) {
@@ -133,7 +204,7 @@ export const analyzeMatch = async (req, res) => {
 };
 
 
-// get history
+// history
 export const getMyAnalysisHistory = async (req, res) => {
     try {
         const history = await Analysis.find({ userId: req.user._id })
@@ -147,7 +218,7 @@ export const getMyAnalysisHistory = async (req, res) => {
 };
 
 
-// get single analysis
+// single
 export const getAnalysisById = async (req, res) => {
     try {
         const analysis = await Analysis.findOne({
