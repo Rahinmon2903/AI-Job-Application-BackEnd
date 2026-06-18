@@ -26,7 +26,7 @@ const cleanSkills = (skills) => {
 };
 
 
-// 🔥 AI FUNCTION 
+//  AI FUNCTION 
 const extractResumeWithAI = async (resumeText) => {
   const response = await groq.chat.completions.create({
     model: "llama-3.1-8b-instant",

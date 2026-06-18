@@ -39,7 +39,7 @@ const SKILL_SYNONYMS = {
 };
 
 
-// 🔧 Normalize skills (SCALABLE)
+//  Normalize skills 
 const normalizeSkill = (skill) => {
     let s = skill.toLowerCase().trim();
 
